@@ -189,6 +189,90 @@ If things are working correctly, you should see the same commit pushed to the
 "master" branch shortly. You can monitor the progress and unexpected errors in
 the "Actions" tab in your repository.
 
+You do not have to be already using GitHub Actions for this to work. You do not
+need to activate or enable the feature for your repository, simply pushing the
+workflow file to the is sufficient. All open-source repositories have unlimited
+GitHub Actions minutes, and all personal and team accounts comes with 2000-3000
+free GitHub Actions minutes for private repositories.
+
+If you already regularly uses up your free minutes, this may slightly increase
+your GitHub bills, but in practice, the workflow we added runs very quickly so
+the impact is very minimal. For reference, GitHub Actions are billed at $0.008
+USD per minute for private repositories, after the free quota is exhausted.
+
+This workflow will be triggered when commits are pushed to either the "master"
+or "main" branch. By default, the [checkout action][checkout-action] fetches
+only the latest commit, which is not sufficient for our purpose. Setting the
+`fetch-depth` option to `0` changes it to fetch all the commits and branches.
+It then push the latest commit to both the "master" and "main" branches. In
+practice, one of the two branches (the one that was pushed to) already has the
+commit, so you would expect to see "Everything up-to-date" in one of the two
+pushes.
+
+By default, when pushing commits from within the GitHub Actions job, it does
+not trigger additional GitHub Actions workflow to run. For example, when a
+contributor pushes to the "main" branch, it will trigger any GitHub Actions
+that normally runs on the "main" branch's push events, including the one we
+added here. However, when our mirror workflow pushes the same commit to the
+"master" branch, it will not trigger any workflow that normally runs on the
+"master" branch's push events.
+
+For this reason, you may want to update existing workflows that runs on the
+"master" branch to also run on the "main" branch, like we did in our mirror
+workflow file (the `on.push.branches` config key).
+
+Alternatively, if it is important to you that workflows are triggered by pushes
+from the mirror workflow, you can accomplish this by supplying an alternative
+SSH key to the [checkout action][checkout-action]:
+
+1. [Generate a new SSH key][generate-ssh-key] locally. Don't worry about adding
+   it to the ssh-agent.
+
+2. Find the generated *public key* and [add it as a deploy key][add-deploy-key]
+   to the repository. Be sure to select "Allow write access".
+
+3. Find the generated *private key* and [add it as a secret][add-secret] to the
+   repository.
+
+4. Change the "Checkout" step in the mirror workflow to use the new deploy key:
+
+   ```yaml
+   - name: Checkout
+     uses: actions/checkout@v2
+     with:
+       fetch-depth: 0
+       ssh-key: ${{ secrets.DEPLOY_KEY }}
+   ```
+
+   Here, `DEPLOY_KEY` is the name you picked from step 3.
+
+With this, the mirror workflow will authenticate with GitHub using the deploy
+key instead of the default token when pushing commits, triggering any workflows
+as if a regular user had pushed those commits. This does not change the author
+or committer on the commits.
+
+After verifying that everything is working as intended, you can start inviting
+the early adopters to start pushing to the "main" branch. The easiest way to do
+this is to rename the local "master" branch:
+
+```bash
+$ cd my-git-project
+$ git checkout master
+$ git branch -m main
+$ git branch -u origin/main
+```
+
+This would also be a good time to start changing any automation or external
+services to the "main" branch to ensure that everything is working as expected.
+
+[add-deploy-key]: https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys
+
+[add-secret]: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository
+
 [change-default-branch]: https://help.github.com/en/github/administering-a-repository/setting-the-default-branch
 
 [change-pr-base-branch]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request
+
+[checkout-action]: https://github.com/actions/checkout
+
+[generate-ssh-key]: https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
