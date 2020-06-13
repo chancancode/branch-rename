@@ -56,3 +56,61 @@ That's all! Since "main" was the first branch you pushed to GitHub, it will be
 set correctly as the default branch. We also never committed any changes to the
 "master" branch locally, it effectively never existed so there is nothing left
 to clean up. Enjoy your new project!
+
+## Simple Migration
+
+If you have a small personal project and you are comfortable with just doing
+the rename right away, here are the steps you can take.
+
+Note that if this is a [GitHub Pages](https://pages.github.com) repository and
+the content is stored on the "master" branch, then you cannot perform the
+migration at this time since GitHub Pages does not seem to support alternative
+default branch names yet. If you want, you may follow the steps in the "Local
+Migration" or "Gradual Migration" section partially to get your project ready.
+
+1. Pull the latest commits from the "master" branch into your local repository:
+
+   ```bash
+   $ cd my-git-project
+   $ git checkout master
+   $ git pull origin master
+   ```
+
+2. Create the new "main" branch, using the "master" branch as a starting point:
+
+   ```bash
+   $ git checkout -b main
+   ```
+
+3. Push the "main" branch to GitHub:
+
+   ```bash
+   $ git push -u origin main
+   ```
+
+4. [Change the default branch on GitHub][change-default-branch] to "main".
+
+5. If there are existing pull requests open against the "master" branch that
+   you would like to keep, [update their base branch][change-pr-base-branch] to
+   the "main" branch. Otherwise, they will be closed automatically when we
+   delete the remote "master" branch on GitHub.
+
+6. Delete your local "master" branch:
+
+   ```bash
+   $ git branch -d master
+   ```
+
+7. Delete the remote "master" branch:
+
+   ```bash
+   $ git push origin :master
+   ```
+
+At this point, the migration is complete. However, as you work on the project,
+you may discover additional settings that you need to tweak to account for the
+rename. For example, you may have update the branch names in your CI config.
+
+[change-default-branch]: https://help.github.com/en/github/administering-a-repository/setting-the-default-branch
+
+[change-pr-base-branch]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request
