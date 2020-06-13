@@ -111,6 +111,84 @@ At this point, the migration is complete. However, as you work on the project,
 you may discover additional settings that you need to tweak to account for the
 rename. For example, you may have update the branch names in your CI config.
 
+## Gradual Migration
+
+If you have a work or open-source repository with multiple contributors and
+forks, you may prefer to perform the migration gradually.
+
+These steps are for you if you find yourself in a similar scenario, where it is
+important to give everyone ample of time to prepare for the migration, changing
+local configs, adapting workflows, scripts and other automation to ensure a
+seamless migration.
+
+This gradual migration plan is intended to be spread out over a long period of
+time – weeks, or months. It uses all available tools on GitHub to provide as
+much advance notice as possible.
+
+For most organizations, this plan may be overly cautious and some of the steps
+may not be necessary. On the other hand, for a popular open-source project, it
+may not be feasible to get to the end and fully deprecate and remove the legacy
+"master" branch at all, due to compatibility requirements. Treat this plan as a
+template and adapt it for your own needs.
+
+Unlike the other sections, the steps here are a bit less exact and is intended
+for someone with a some prior experience with Git and GitHub. In practice, you
+will probably run into situations that causes deviations from the plan which
+would require some manual repair and adjustments. For example, pushes during a
+partial GitHub outage may cause the two branches to diverge and requires you
+to determine how to best reconcile the differences.
+
+### Phase 1: Mirror "master" and "main"
+
+The goal of this phase is to make it _possible_ to use the "main" branch name
+as an alternative. This allows some early adaopters to start testing the new
+setup.
+
+1. As always, make sure your local "master" branch is up-to-date.
+
+2. Create the new "main" branch:
+
+   ```bash
+   $ git checkout -b main
+   ```
+
+3. Add a [GitHub Actions](https://github.com/features/actions) workflow file at
+   **.github/workflows/mirror-master-and-main.yml** with the following:
+
+   ```yaml
+   name: Mirror "master" and "main" branches
+   on:
+     push:
+       branches:
+         - master
+         - main
+
+   jobs:
+     mirror:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Checkout
+           uses: actions/checkout@v2
+           with:
+             fetch-depth: 0
+         - name: Push
+           run: |
+             git push origin HEAD:master
+             git push origin HEAD:main
+   ```
+
+4. Commit and your changes to the local "main" branch.
+
+5. Push your changes to the remote "main" branch:
+
+   ```bash
+   $ git push -u origin main
+   ```
+
+If things are working correctly, you should see the same commit pushed to the
+"master" branch shortly. You can monitor the progress and unexpected errors in
+the "Actions" tab in your repository.
+
 [change-default-branch]: https://help.github.com/en/github/administering-a-repository/setting-the-default-branch
 
 [change-pr-base-branch]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request
