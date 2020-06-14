@@ -219,7 +219,8 @@ added here. However, when our mirror workflow pushes the same commit to the
 
 For this reason, you may want to update existing workflows that runs on the
 "master" branch to also run on the "main" branch, like we did in our mirror
-workflow file (the `on.push.branches` config key).
+workflow file (the `on.push.branches` config key). This is the recommended
+approach as it ensures only a single build per push.
 
 Alternatively, if it is important to you that workflows are triggered by pushes
 from the mirror workflow, you can accomplish this by supplying an alternative
@@ -264,6 +265,113 @@ $ git branch -u origin/main
 
 This would also be a good time to start changing any automation or external
 services to the "main" branch to ensure that everything is working as expected.
+
+### Phase 2: Change the default branch to "main", deprecate "master"
+
+After verifying the viability of the rename during the previous phase, the goal
+of this phase is to set "main" as the default branch and start issuing
+deprecation warnings when the legacy "master" branch is used.
+
+1. [Change the default branch on GitHub][change-default-branch] to "main".
+
+2. Add a [GitHub Actions](https://github.com/features/actions) workflow file at
+   **.github/workflows/deprecate-master-branch.yml** with the following:
+
+   ```yaml
+   name: Deprecate "master" branch
+   on:
+     push:
+       branches:
+         - master
+     pull_request:
+       branches:
+         - master
+
+   jobs:
+     on-push:
+       runs-on: ubuntu-latest
+       if: ${{ github.event_name == 'push' }}
+       steps:
+         - name: Deprecation
+           uses: peter-evans/commit-comment@v1
+           with:
+             body: |
+               Hello @${{ github.event.sender.login }}!
+
+               I see that you have pushed some commits to the "master" branch. We are in the process of renaming the "master" branch to "main" in this repository.
+
+               :warning: **The "master" branch is deprecated and will be removed from this repository in the future.**
+
+               Please migrate your local repository by renaming the "master" branch to "main":
+
+               ```bash
+               $ cd my-git-project
+               $ git checkout master
+               $ git branch -m main
+               $ git branch -u origin/main
+               ```
+
+               Before merging pull requests, ensure their base branch is set to "main" instead of "master". For more information on how to do this, refer to [this GitHub support article][1].
+
+               [1]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request
+
+     on-pull-request:
+       runs-on: ubuntu-latest
+       if: ${{ github.event_name == 'pull_request' }}
+       env:
+         DEPRECATION_MESSAGE: |
+           Hello @${{ github.event.sender.login }}!
+
+           I see that you have opened a pull request against the "master" branch. We are in the process of renaming the "master" branch to "main" in this repository.
+
+           :warning: **The "master" branch is deprecated and will be removed from this repository in the future.**
+
+           Please migrate your local repository by renaming the "master" branch to "main":
+
+           ```bash
+           $ cd my-git-project
+           $ git checkout master
+           $ git branch -m main
+           $ git branch -u origin/main
+           ```
+
+           Please also set the base branch for this pull request to "main" instead of "master". For more information on how to do this, refer to [this GitHub support article][1].
+
+           [1]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request
+       steps:
+         - name: Deprecation
+           if: ${{ github.event.pull_request.head.repo.fork == false }}
+           uses: peter-evans/create-or-update-comment@v1
+           with:
+             issue-number: ${{ github.event.number }}
+             body: ${{ env.DEPRECATION_MESSAGE }}
+         - name: Deprecation
+           if: ${{ github.event.pull_request.head.repo.fork == true }}
+           run: |
+            echo "$DEPRECATION_MESSAGE"
+            echo '::error::Please set the base branch for this pull request to "main" instead of "master".'
+            exit 1
+   ```
+
+3. Commit and push your changes to the "main" branch.
+
+We added a workflow file that triggers whenever a contributor pushes to or
+opens a pull request against the "master" branch.
+
+The workflow adds a comment to the commit or pull request, notifying the
+contributor that the "master" branch has been deprecated, along with the steps
+they need to take to migrate their local repository and changes they need to
+make to the pull request.
+
+Unfortunately, due to limitations of GitHub Actions, it is not possible to add
+a pull request comment from the workflow when the pull request originated from
+a fork, which is very common in open-source repositories. As a workaround, the
+workflow prints the deprecation message to the logs and fails the build.
+
+It is recommended that you customize the messages with additional information
+relevant for your organization. For example, you may want to include a link to
+a tracking issue for additional context, or ways for the contributor to ask for
+additional assistance if needed.
 
 [add-deploy-key]: https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys
 
