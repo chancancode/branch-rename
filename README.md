@@ -6,6 +6,16 @@ going to use this as our example, but you may have a different use case in
 mind. If that's the case, just replace "master" and "main" to the source and
 target branches you have in mind.
 
+## Table of Contents
+
+* If you are starting a brand new project, see [New Project](#new-project).
+
+* For small personal projects, see [Simple Migration](#simple-migration).
+
+* For work or open-source projects, see [Gradual Migration](#gradual-migration).
+
+* For projects you don't control, see [Local Migration](#local-migration).
+
 ## New Project
 
 If you are starting a brand new project, you can follow these steps:
@@ -21,7 +31,8 @@ If you are starting a brand new project, you can follow these steps:
    If you wish to use any of these features (i.e. with settings different than
    the above), that is not a problem. However, GitHub will create the default
    "master" branch for you. In that case, clone the repository locally and
-   follow the steps in the **Simple Migration** section instead.
+   follow the steps in the [**Simple Migration**](#simple-migration) section
+   instead.
 
 2. Initialize an empty Git repository:
 
@@ -65,8 +76,9 @@ the rename right away, here are the steps you can take.
 Note that if this is a [GitHub Pages](https://pages.github.com) repository and
 the content is stored on the "master" branch, then you cannot perform the
 migration at this time since GitHub Pages does not seem to support alternative
-default branch names yet. If you want, you may follow the steps in the "Local
-Migration" or "Gradual Migration" section partially to get your project ready.
+default branch names yet. If you want, you may follow the steps in the [**Local
+Migration**](#local-migration) or [**Gradual Migration**](#gradual-migration)
+section partially to get your project ready.
 
 1. Pull the latest commits from the "master" branch into your local repository:
 
@@ -429,7 +441,19 @@ a similar result. For example, instead of mirroring the "main" branch to the
 ## Local Migration
 
 Finally, if you are working on a respository you don't control, and you would
-like to
+like to refer to your local branch with a different name without making any
+changes to the upstream project, you can rename your local "master" branch to
+"main" with these steps:
+
+```shell
+$ cd my-git-project
+$ git checkout master
+$ git branch -m main
+$ git branch -u origin/master
+```
+
+This reanmes the local branch to "main" but sets the remote tracking branch to
+"master".
 
 [add-deploy-key]: https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys
 
