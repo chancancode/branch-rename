@@ -426,6 +426,11 @@ a similar result. For example, instead of mirroring the "main" branch to the
 "master" branch exactly, you could add a post-install hook to the version on
 "master" to issue the deprecation message for any potential consumers.
 
+## Local Migration
+
+Finally, if you are working on a respository you don't control, and you would
+like to
+
 [add-deploy-key]: https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys
 
 [add-secret]: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository
