@@ -88,10 +88,10 @@ section partially to get your project ready.
    $ git pull origin master
    ```
 
-2. Create the new "main" branch, using the "master" branch as a starting point:
+2. Rename the local "master" branch to "main":
 
    ```bash
-   $ git checkout -b main
+   $ git branch -m main
    ```
 
 3. Push the "main" branch to GitHub:
