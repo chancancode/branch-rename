@@ -373,6 +373,59 @@ relevant for your organization. For example, you may want to include a link to
 a tracking issue for additional context, or ways for the contributor to ask for
 additional assistance if needed.
 
+### Phase 3: Complete the migration
+
+After a successful phase 2 rollout, it is time to plan for completing the
+migration. However, what completion means is going to be different depending on
+your situation.
+
+For private work repositories, the legacy "master" branch can likely be removed
+from the repository after giving team members a few weeks to migrate. Don't
+forget to remove the workflow files as well.
+
+For open-source repositories with lots of contributors, you may want to move a
+lot slower. Monitor the Actions tab of the repository to see how often the
+deprecation workflow is triggered. When the activity diminishes, it may be good
+indication that the legacy "master" branch is no longer needed.
+
+As an alternative to removing the branch, you may also want to consider pushing
+a final commit to the branch, removing all files but leave behind a README file
+explaining that branch has been moved.
+
+For repositories containing *installable packages*, there are some additional
+considerations. Many package managers allow for installing packages from a Git
+repository. For example, in npm and yarn, dependencies can be a string like
+"username/repo" or "username/repo#branch" in lieu of version range. Likewise,
+GitHub Actions are installed using repository and branch references, and it is
+a relatively common practice to point an action at the "master" branch.
+
+In these cases, the decision on whether to remove the legacy "master" branch
+has to be made carefully. Here are a some examples of things to investigate
+and consider:
+
+* When the branch is omitted from the specifier (e.g. "username/repo"), does
+  the package manager in your ecosystem hard-code the default to "master" on
+  the client, or does it respect the remote HEAD ref?
+
+* Does the package manager use a lockfile, and if so, does it serialize the
+  branch name (as opposed to the resolved SHA) into the lockfile?
+
+The answer to these questions affects the potential impact to your end-users
+if the legacy "master" branch is removed from the repository. For some, the
+end-state of the migration may be to keep the "master" branch permanently as a
+read-only mirror, or it may be sufficient to freeze the branch's content and
+stop providing updates there. For others, the potential breakage maybe small
+enough that it is can be easily justified.
+
+While the workflows added in phase 2 are effective for deprecating _writes_ to
+the legacy "master" branch. Unfortunately, Git and GitHub does not offer the
+ability to do the same for _reads_ to the branch.
+
+However, you may be able to use features from the package manager to accomplish
+a similar result. For example, instead of mirroring the "main" branch to the
+"master" branch exactly, you could add a post-install hook to the version on
+"master" to issue the deprecation message for any potential consumers.
+
 [add-deploy-key]: https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys
 
 [add-secret]: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository
