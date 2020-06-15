@@ -221,6 +221,39 @@ practice, one of the two branches (the one that was pushed to) already has the
 commit, so you would expect to see "Everything up-to-date" in one of the two
 pushes.
 
+Unfortunately, if you have enabled [branch protection][branch-protection] on
+the "master" branch, the push from the mirroring action may be rejected. For
+example, if you had enabled "Require pull request reviews before merging", then
+this would not work as the changes are expected to be submitted via a pull
+request with reviews.
+
+A possible work around is to disable the "Include administrators" checkbox in
+the branch protection settings for the "master" branch and configure the script
+to push the commits as an administrator:
+
+1. Login as an administrator on GitHub.
+
+2. Generate a [personal access token][personal-access-token] with the "repo"
+   scope (and the "public_repo" scope, if needed).
+
+3. [Add it as a secret][add-secret] to the repository.
+
+4. Change the "Checkout" step in the mirror workflow to use the new deploy key:
+
+   ```yaml
+   - name: Checkout
+     uses: actions/checkout@v2
+     with:
+       fetch-depth: 0
+       token: ${{ secrets.DEPLOY_TOKEN }}
+   ```
+
+   Here, `DEPLOY_TOKEN` is the name you picked from step 3.
+
+Alternatively, a SSH key for the administrator can be used instead of a
+personal access token, via the `ssh-key` argument. See the documentation for
+the [checkout action][checkout-action] for more details.
+
 By default, when pushing commits from within the GitHub Actions job, it does
 not trigger additional GitHub Actions workflow to run. For example, when a
 contributor pushes to the "main" branch, it will trigger any GitHub Actions
@@ -581,6 +614,8 @@ This reanmes the local branch to "main" but sets the remote tracking branch to
 
 [add-secret]: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository
 
+[branch-protection]: https://help.github.com/en/github/administering-a-repository/configuring-protected-branches
+
 [change-default-branch]: https://help.github.com/en/github/administering-a-repository/setting-the-default-branch
 
 [change-pr-base-branch]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request
@@ -588,5 +623,7 @@ This reanmes the local branch to "main" but sets the remote tracking branch to
 [checkout-action]: https://github.com/actions/checkout
 
 [generate-ssh-key]: https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+[personal-access-token]: https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
 
 [semver]: https://semver.org
