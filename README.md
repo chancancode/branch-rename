@@ -400,9 +400,10 @@ lot slower. Monitor the Actions tab of the repository to see how often the
 deprecation workflow is triggered. When the activity diminishes, it may be good
 indication that the legacy "master" branch is no longer needed.
 
-As an alternative to removing the branch, you may also want to consider pushing
-a final commit to the branch, removing all files but leave behind a README file
-explaining that branch has been moved.
+As an alternative to removing the branch right away, you may want to consider
+pushing a final commit to the branch, removing all files but leave behind a
+README file explaining that branch has been moved, along with the steps they
+need to take in order to migrate their local repository.
 
 For repositories containing *installable packages*, there are some additional
 considerations. Many package managers allow for installing packages from a Git
@@ -422,6 +423,9 @@ and consider:
 * Does the package manager use a lockfile, and if so, does it serialize the
   branch name (as opposed to the resolved SHA) into the lockfile?
 
+* Does the package manager maintain a cache of cloned repositories, and if so
+  do they recover gracefully to a remote branch disappearing?
+
 The answer to these questions affects the potential impact to your end-users
 if the legacy "master" branch is removed from the repository. For some, the
 end-state of the migration may be to keep the "master" branch permanently as a
@@ -437,6 +441,124 @@ However, you may be able to use features from the package manager to accomplish
 a similar result. For example, instead of mirroring the "main" branch to the
 "master" branch exactly, you could add a post-install hook to the version on
 "master" to issue the deprecation message for any potential consumers.
+
+Using the Node.js ecosystem as an example, we can put these considerations into
+context, based on preliminary testing with npm and yarn classic (v1). If you
+found different results in your own testing, or with other package managers
+(pnpm, yarn v2, etc), please file an issue here.
+
+* The popular package managers in the ecosystem support installing packages
+  from git, by specifying "username/repo" or "username/repo#branch" in the
+  dependencies section of package.json.
+
+* When a branch name is not specified, the popular package managers defaults to
+  the remote HEAD ref, which is set by the default branch on GitHub, instead of
+  hardcoding to the "master" branch in the client.
+
+* The popular package managers uses a lockfile by default. They serialize the
+  resolved SHA into the lockfiles, as long as the commits referred to by these
+  SHAs remain reachable on the remote repository, they will install just fine
+  when using a lockfile. In the case of a branch rename, this is not an issue,
+  as the history and commits will remain intact.
+
+* When installing without a lockfile, the popular package managers will fetch
+  the latest commit from the repository. Renaming the remote branch did not
+  appear to cause any issues, either because the repositories are not cached,
+  or the clients are able to recover gracefully from a "missing" remote branch.
+
+* Post-install hooks are supported. However, yarn classic [hides the output
+  produced by these scripts](https://github.com/yarnpkg/yarn/issues/5476) if
+  they are successful (exit cleanly with exit code 0). However, when they fail,
+  they output _is_ shown to the user.
+
+* Generally speaking, the ecosystem has strong norms and expectations around
+  adhering to [semantic versioning][semver]. Usually, breaking changes are only
+  expected on major version bumps.
+
+* By using a Git dependency instead of specifying a semver range, they are
+  explicitly opting out of the normal semver guarentee, and breakages are to be
+  expected. No one could reasonably expect that pointing a dependency to the
+  active development branch without using a lockfile will result in a stable
+  system.
+
+Given these findings, here is a concrete proposal for a maximally graceful
+completion plan:
+
+1. Stop providing updates to the "master" branch by removing the mirroring
+   workflow added in phase 1.
+
+2. Push a commit the "master" branch, updating the README as well as adding a
+   deprecation message to the runtime code (the `main` entry point):
+
+   ```js
+   // index.js
+
+   let command = 'npm update my-git-project';
+
+   if (process.env.npm_execpath && process.env.npm_execpath.indexOf('yarn') !== -1) {
+     command = 'yarn upgrade my-git-project';
+   }
+
+   console.warn(
+     `You are running a deprecated copy of the "my-git-project" installed ` +
+     `from the "master" branch of our repository. The "master" branch is ` +
+     `deprecated and no longer receives any updates. The branch will soon ` +
+     `be removed from our repository, at which point the package will fail ` +
+     `to install.\n\n` +
+     `To fix this issue, please modify your package.json and change the ` +
+     `"my-git-project" dependency from "my-repo/my-git-project#master" to ` +
+     `"my-repo/my-git-project" or a valid semver range. After making the ` +
+     `change, run "${command}" to update the package.`
+   );
+
+   // ...rest of index.js
+   ```
+
+3. When releasing the next major verions of the package, push another commit to
+   the "master" branch, remove all files from the branch, leaving behind only a
+   minimal README file, package.json and index.js:
+
+   ```js
+   // package.json
+   {
+     "name": "my-git-project",
+     "scripts": {
+       "postinstall": "node index.js"
+     }
+   }
+   ```
+
+   ```js
+   // index.js
+
+   let command = 'npm update my-git-project';
+
+   if (process.env.npm_execpath && process.env.npm_execpath.indexOf('yarn') !== -1) {
+     command = 'yarn upgrade my-git-project';
+   }
+
+   console.error(
+     `You have installed "my-git-project" from the "master" branch of our ` +
+     `repository. The "master" branch has been official retired.\n\n` +
+     `To fix this issue, please modify your package.json and change the ` +
+     `"my-git-project" dependency from "my-repo/my-git-project#master" to ` +
+     `"my-repo/my-git-project" or a valid semver range. After making the ` +
+     `change, run "${command}" to update the package.`
+   );
+
+   process.exit(1);
+   ```
+
+4. After some time, the master branch can be removed from the repository. This
+   does not constitute a breaking change, as the package already ceased to
+   function as of the previous commit. It was just a courteous message to ease
+   confusion and provide actionable instructions for fixing the issue.
+
+For most projects and orgnizations, this amount of notice is probably not
+necessary or warranted, but it showcases the available tools and techniques,
+and demonstrates that there can be a good migration path even under very strict
+compatibility requirements. As always, use these steps as a template and tailor
+them to your own needs.
 
 ## Local Migration
 
@@ -466,3 +588,5 @@ This reanmes the local branch to "main" but sets the remote tracking branch to
 [checkout-action]: https://github.com/actions/checkout
 
 [generate-ssh-key]: https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+[semver]: https://semver.org
