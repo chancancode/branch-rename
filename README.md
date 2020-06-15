@@ -231,7 +231,8 @@ A possible work around is to disable the "Include administrators" checkbox in
 the branch protection settings for the "master" branch and configure the script
 to push the commits as an administrator:
 
-1. Login as an administrator on GitHub.
+1. Login as an administrator on GitHub. You may also want to consider creating
+   a new account specifically for this purpose.
 
 2. Generate a [personal access token][personal-access-token] with the "repo"
    scope (and the "public_repo" scope, if needed).
