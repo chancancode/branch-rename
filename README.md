@@ -419,6 +419,10 @@ relevant for your organization. For example, you may want to include a link to
 a tracking issue for additional context, or ways for the contributor to ask for
 additional assistance if needed.
 
+This would be a good time to start updating any internal and external links to
+the "master" branch. A common example would be automatically generated links to
+source code from API documentation.
+
 ### Phase 3: Complete the migration
 
 After a successful phase 2 rollout, it is time to plan for completing the
@@ -438,6 +442,23 @@ As an alternative to removing the branch right away, you may want to consider
 pushing a final commit to the branch, removing all files but leave behind a
 README file explaining that branch has been moved, along with the steps they
 need to take in order to migrate their local repository.
+
+It is also important to consider URL breakages, as links that points to the
+files on the "master" branch will stop working once the branch is removed,
+including with the soft-removal method described above.
+
+The impact of this has to be evaluated contextually, but it is important to
+note that the scope of the breakage is fairly limited, as this only directly
+impacts URLs that links to the "master" branch directly. Links pointing to the
+active development branch of repository is quite fragile (especially with line
+numbers) and often breaks for other reasons.
+
+For example, a refactor that moves around files or switching from JavaSciprt to
+TypeScript would invalidate these URLs. This sorts of activity is fairly common
+on an active code repository and is usually performed without taking the URL
+consideration in mind. For this reason, it is considered a best practice to use
+SHA-based [permanent links][permanent-links] in most situations. These links
+are unaffected by the branch rename.
 
 For repositories containing *installable packages*, there are some additional
 considerations. Many package managers allow for installing packages from a Git
@@ -624,6 +645,8 @@ This reanmes the local branch to "main" but sets the remote tracking branch to
 [checkout-action]: https://github.com/actions/checkout
 
 [generate-ssh-key]: https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+[permanent-links]: https://help.github.com/en/github/managing-files-in-a-repository/getting-permanent-links-to-files
 
 [personal-access-token]: https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
 
