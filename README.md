@@ -629,7 +629,7 @@ $ git branch -m main
 $ git branch -u origin/master
 ```
 
-This reanmes the local branch to "main" but sets the remote tracking branch to
+This renames the local branch to "main" but sets the remote tracking branch to
 "master".
 
 [add-deploy-key]: https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys
