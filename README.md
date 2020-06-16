@@ -201,6 +201,8 @@ If things are working correctly, you should see the same commit pushed to the
 "master" branch shortly. You can monitor the progress and unexpected errors in
 the "Actions" tab in your repository.
 
+#### About GitHub Actions
+
 You do not have to be already using GitHub Actions for this to work. You do not
 need to activate or enable the feature for your repository, simply pushing the
 workflow file to the is sufficient. All open-source repositories have unlimited
@@ -220,6 +222,8 @@ It then push the latest commit to both the "master" and "main" branches. In
 practice, one of the two branches (the one that was pushed to) already has the
 commit, so you would expect to see "Everything up-to-date" in one of the two
 pushes.
+
+#### Interaction with Branch Protection
 
 Unfortunately, if you have enabled [branch protection][branch-protection] on
 the "master" branch, the push from the mirroring action may be rejected. For
@@ -254,6 +258,8 @@ to push the commits as an administrator:
 Alternatively, a SSH key for the administrator can be used instead of a
 personal access token, via the `ssh-key` argument. See the documentation for
 the [checkout action][checkout-action] for more details.
+
+#### Interation with Other GitHub Action Workflows
 
 By default, when pushing commits from within the GitHub Actions job, it does
 not trigger additional GitHub Actions workflow to run. For example, when a
@@ -297,6 +303,8 @@ With this, the mirror workflow will authenticate with GitHub using the deploy
 key instead of the default token when pushing commits, triggering any workflows
 as if a regular user had pushed those commits. This does not change the author
 or committer on the commits.
+
+#### Next Steps
 
 After verifying that everything is working as intended, you can start inviting
 the early adopters to start pushing to the "main" branch. The easiest way to do
@@ -409,15 +417,19 @@ contributor that the "master" branch has been deprecated, along with the steps
 they need to take to migrate their local repository and changes they need to
 make to the pull request.
 
+It is recommended that you customize the messages with additional information
+relevant for your organization. For example, you may want to include a link to
+a tracking issue for additional context, or ways for the contributor to ask for
+additional assistance if needed.
+
+#### Limitations of GitHub Actions in Forks
+
 Unfortunately, due to limitations of GitHub Actions, it is not possible to add
 a pull request comment from the workflow when the pull request originated from
 a fork, which is very common in open-source repositories. As a workaround, the
 workflow prints the deprecation message to the logs and fails the build.
 
-It is recommended that you customize the messages with additional information
-relevant for your organization. For example, you may want to include a link to
-a tracking issue for additional context, or ways for the contributor to ask for
-additional assistance if needed.
+#### Next Steps
 
 This would be a good time to start updating any internal and external links to
 the "master" branch. A common example would be automatically generated links to
@@ -438,10 +450,14 @@ lot slower. Monitor the Actions tab of the repository to see how often the
 deprecation workflow is triggered. When the activity diminishes, it may be good
 indication that the legacy "master" branch is no longer needed.
 
+#### Soft Removal
+
 As an alternative to removing the branch right away, you may want to consider
 pushing a final commit to the branch, removing all files but leave behind a
 README file explaining that branch has been moved, along with the steps they
 need to take in order to migrate their local repository.
+
+#### URL Considerations
 
 It is also important to consider URL breakages, as links that points to the
 files on the "master" branch will stop working once the branch is removed,
@@ -459,6 +475,8 @@ on an active code repository and is usually performed without taking the URL
 consideration in mind. For this reason, it is considered a best practice to use
 SHA-based [permanent links][permanent-links] in most situations. These links
 are unaffected by the branch rename.
+
+#### Packages Considerations
 
 For repositories containing *installable packages*, there are some additional
 considerations. Many package managers allow for installing packages from a Git
@@ -496,6 +514,8 @@ However, you may be able to use features from the package manager to accomplish
 a similar result. For example, instead of mirroring the "main" branch to the
 "master" branch exactly, you could add a post-install hook to the version on
 "master" to issue the deprecation message for any potential consumers.
+
+#### A Concrete Example
 
 Using the Node.js ecosystem as an example, we can put these considerations into
 context, based on preliminary testing with npm and yarn classic (v1). If you
