@@ -217,6 +217,21 @@ all of the Git objects needed for the ref update are already in the remote
 repository. It then push the latest commit to both the "master" and "main"
 branches.
 
+#### Avoiding long checkout times
+
+For large repositories, the checkout can take a long time, and waste a lot of
+bandwidth. To avoid this, you can use the "partial clone" feature by replacing
+the steps with this:
+
+```yaml
+      - name: Partial clone
+        run: git clone --bare --depth=1 --single-branch --filter=blob:none ${{ github.event.repository.html_url }} .
+      - name: Configure push token
+        run: git config http.https://github.com/.extraheader "Authorization: Basic $(echo -n x-access-token:${{ github.token }} | base64 --wrap=0)"
+      - name: Push
+        run: git push origin HEAD:master HEAD:main
+```
+
 #### Interaction with Branch Protection
 
 Unfortunately, if you have enabled [branch protection][branch-protection] on
