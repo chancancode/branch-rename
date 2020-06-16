@@ -632,11 +632,24 @@ $ git branch -u origin/master
 This renames the local branch to "main" but sets the remote tracking branch to
 "master".
 
+## License
+
+This content in this repository, including this documentation and code examples
+are licensed under the [CC0 "No Rights Reserved"][cc0-license] public domain
+license. Feel free to reproduce and adapt this work into your own proposals,
+documentation, etc.
+
+Attribution is not necessary. However, this guide receives constant updates to
+reflect current best-practice and solutions based implementation feedback, so
+a reference to this repository may be helpful.
+
 [add-deploy-key]: https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys
 
 [add-secret]: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository
 
 [branch-protection]: https://help.github.com/en/github/administering-a-repository/configuring-protected-branches
+
+[cc0-license]: https://creativecommons.org/share-your-work/public-domain/cc0/
 
 [change-default-branch]: https://help.github.com/en/github/administering-a-repository/setting-the-default-branch
 
