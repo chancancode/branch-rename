@@ -184,9 +184,7 @@ setup.
            with:
              fetch-depth: 0
          - name: Push
-           run: |
-             git push origin HEAD:master
-             git push origin HEAD:main
+           run: git push origin HEAD:master HEAD:main
    ```
 
 4. Commit and your changes to the local "main" branch.
@@ -218,10 +216,7 @@ This workflow will be triggered when commits are pushed to either the "master"
 or "main" branch. By default, the [checkout action][checkout-action] fetches
 only the latest commit, which is not sufficient for our purpose. Setting the
 `fetch-depth` option to `0` changes it to fetch all the commits and branches.
-It then push the latest commit to both the "master" and "main" branches. In
-practice, one of the two branches (the one that was pushed to) already has the
-commit, so you would expect to see "Everything up-to-date" in one of the two
-pushes.
+It then push the latest commit to both the "master" and "main" branches.
 
 #### Interaction with Branch Protection
 
