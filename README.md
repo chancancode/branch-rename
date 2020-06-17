@@ -214,7 +214,7 @@ This workflow will be triggered when commits are pushed to either the "master"
 or "main" branch. By default, the [checkout action][checkout-action] fetches
 only the latest commit, which is more than sufficient for our purpose because
 all of the Git objects needed for the ref update are already in the remote
-repository. It then push the latest commit to both the "master" and "main"
+repository. It then pushes the latest commit to both the "master" and "main"
 branches.
 
 #### Avoiding long checkout times
