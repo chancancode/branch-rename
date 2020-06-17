@@ -181,12 +181,8 @@ setup.
        steps:
          - name: Checkout
            uses: actions/checkout@v2
-           with:
-             fetch-depth: 0
          - name: Push
-           run: |
-             git push origin HEAD:master
-             git push origin HEAD:main
+           run: git push origin HEAD:master HEAD:main
    ```
 
 4. Commit and your changes to the local "main" branch.
@@ -216,12 +212,25 @@ USD per minute for private repositories, after the free quota is exhausted.
 
 This workflow will be triggered when commits are pushed to either the "master"
 or "main" branch. By default, the [checkout action][checkout-action] fetches
-only the latest commit, which is not sufficient for our purpose. Setting the
-`fetch-depth` option to `0` changes it to fetch all the commits and branches.
-It then push the latest commit to both the "master" and "main" branches. In
-practice, one of the two branches (the one that was pushed to) already has the
-commit, so you would expect to see "Everything up-to-date" in one of the two
-pushes.
+only the latest commit, which is more than sufficient for our purpose because
+all of the Git objects needed for the ref update are already in the remote
+repository. It then pushes the latest commit to both the "master" and "main"
+branches.
+
+#### Avoiding long checkout times
+
+For large repositories, the checkout can take a long time, and waste a lot of
+bandwidth. To avoid this, you can use the "partial clone" feature by replacing
+the steps with this:
+
+```yaml
+      - name: Partial clone
+        run: git clone --bare --depth=1 --single-branch --filter=blob:none ${{ github.event.repository.html_url }} .
+      - name: Configure push token
+        run: git config http.https://github.com/.extraheader "Authorization: Basic $(echo -n x-access-token:${{ github.token }} | base64 --wrap=0)"
+      - name: Push
+        run: git push origin HEAD:master HEAD:main
+```
 
 #### Interaction with Branch Protection
 
@@ -249,7 +258,6 @@ to push the commits as an administrator:
    - name: Checkout
      uses: actions/checkout@v2
      with:
-       fetch-depth: 0
        token: ${{ secrets.DEPLOY_TOKEN }}
    ```
 
@@ -293,7 +301,6 @@ SSH key to the [checkout action][checkout-action]:
    - name: Checkout
      uses: actions/checkout@v2
      with:
-       fetch-depth: 0
        ssh-key: ${{ secrets.DEPLOY_KEY }}
    ```
 
