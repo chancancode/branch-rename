@@ -181,8 +181,6 @@ setup.
        steps:
          - name: Checkout
            uses: actions/checkout@v2
-           with:
-             fetch-depth: 0
          - name: Push
            run: git push origin HEAD:master HEAD:main
    ```
@@ -214,9 +212,10 @@ USD per minute for private repositories, after the free quota is exhausted.
 
 This workflow will be triggered when commits are pushed to either the "master"
 or "main" branch. By default, the [checkout action][checkout-action] fetches
-only the latest commit, which is not sufficient for our purpose. Setting the
-`fetch-depth` option to `0` changes it to fetch all the commits and branches.
-It then push the latest commit to both the "master" and "main" branches.
+only the latest commit, which is more than sufficient for our purpose because
+all of the Git objects needed for the ref update are already in the remote
+repository. It then push the latest commit to both the "master" and "main"
+branches.
 
 #### Interaction with Branch Protection
 
@@ -244,7 +243,6 @@ to push the commits as an administrator:
    - name: Checkout
      uses: actions/checkout@v2
      with:
-       fetch-depth: 0
        token: ${{ secrets.DEPLOY_TOKEN }}
    ```
 
@@ -288,7 +286,6 @@ SSH key to the [checkout action][checkout-action]:
    - name: Checkout
      uses: actions/checkout@v2
      with:
-       fetch-depth: 0
        ssh-key: ${{ secrets.DEPLOY_KEY }}
    ```
 
