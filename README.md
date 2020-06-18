@@ -227,7 +227,9 @@ the steps with this:
       - name: Configure Git
       - run: git config --global http.https://github.com/.extraheader "Authorization: Basic $(echo -n x-access-token:${{ github.token }} | base64 --wrap=0)"
       - name: Partial clone
-        run: git clone --bare --depth=1 --single-branch --filter=blob:none ${{ github.event.repository.html_url }} .
+        env:
+          ref: ${{ github.event.ref }}
+        run: git clone --bare --depth=100 --single-branch --branch ${ref#refs/heads/} --filter=blob:none ${{ github.event.repository.html_url }} .
       - name: Push
         run: git push origin HEAD:master HEAD:main
 ```
