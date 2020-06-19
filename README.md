@@ -153,7 +153,7 @@ to determine how to best reconcile the differences.
 ### Phase 1: Mirror "master" and "main"
 
 The goal of this phase is to make it _possible_ to use the "main" branch name
-as an alternative. This allows some early adaopters to start testing the new
+as an alternative. This allows some early adopters to start testing the new
 setup.
 
 1. As always, make sure your local "master" branch is up-to-date.
@@ -243,7 +243,7 @@ example, if you had enabled "Require pull request reviews before merging", then
 this would not work as the changes are expected to be submitted via a pull
 request with reviews.
 
-A possible work around is to disable the "Include administrators" checkbox in
+A possible workaround is to disable the "Include administrators" checkbox in
 the branch protection settings for the "master" branch and configure the script
 to push the commits as an administrator:
 
@@ -266,11 +266,11 @@ to push the commits as an administrator:
 
    Here, `DEPLOY_TOKEN` is the name you picked from step 3.
 
-Alternatively, a SSH key for the administrator can be used instead of a
+Alternatively, an SSH key for the administrator can be used instead of a
 personal access token, via the `ssh-key` argument. See the documentation for
 the [checkout action][checkout-action] for more details.
 
-#### Interation with Other GitHub Action Workflows
+#### Interaction with Other GitHub Action Workflows
 
 By default, when pushing commits from within the GitHub Actions job, it does
 not trigger additional GitHub Actions workflow to run. For example, when a
@@ -281,7 +281,7 @@ added here. However, when our mirror workflow pushes the same commit to the
 "master" branch's push events.
 
 For this reason, you may want to update existing workflows that runs on the
-"master" branch to also run on the "main" branch, like we did in our mirror
+"master" branch to also run on the "main" branch, as we did in our mirror
 workflow file (the `on.push.branches` config key). This is the recommended
 approach as it ensures only a single build per push.
 
@@ -425,7 +425,7 @@ opens a pull request against the "master" branch.
 The workflow adds a comment to the commit or pull request, notifying the
 contributor that the "master" branch has been deprecated, along with the steps
 they need to take to migrate their local repository and changes they need to
-make to the pull request.
+make it to the pull request.
 
 It is recommended that you customize the messages with additional information
 relevant for your organization. For example, you may want to include a link to
@@ -443,7 +443,7 @@ workflow prints the deprecation message to the logs and fails the build.
 
 This would be a good time to start updating any internal and external links to
 the "master" branch. A common example would be automatically generated links to
-source code from API documentation.
+source code from the API documentation.
 
 ### Phase 3: Complete the migration
 
@@ -479,8 +479,8 @@ impacts URLs that links to the "master" branch directly. Links pointing to the
 active development branch of repository is quite fragile (especially with line
 numbers) and often breaks for other reasons.
 
-For example, a refactor that moves around files or switching from JavaSciprt to
-TypeScript would invalidate these URLs. This sorts of activity is fairly common
+For example, a refactor that moves around files or switching from JavaScript to
+TypeScript would invalidate these URLs. This sort of activity is fairly common
 on an active code repository and is usually performed without taking the URL
 consideration in mind. For this reason, it is considered a best practice to use
 SHA-based [permanent links][permanent-links] in most situations. These links
@@ -496,7 +496,7 @@ GitHub Actions are installed using repository and branch references, and it is
 a relatively common practice to point an action at the "master" branch.
 
 In these cases, the decision on whether to remove the legacy "master" branch
-has to be made carefully. Here are a some examples of things to investigate
+has to be made carefully. Here are some examples of things to investigate
 and consider:
 
 * When the branch is omitted from the specifier (e.g. "username/repo"), does
@@ -517,7 +517,7 @@ stop providing updates there. For others, the potential breakage maybe small
 enough that it is can be easily justified.
 
 While the workflows added in phase 2 are effective for deprecating _writes_ to
-the legacy "master" branch. Unfortunately, Git and GitHub does not offer the
+the legacy "master" branch. Unfortunately, Git and GitHub do not offer the
 ability to do the same for _reads_ to the branch.
 
 However, you may be able to use features from the package manager to accomplish
@@ -561,7 +561,7 @@ found different results in your own testing, or with other package managers
   expected on major version bumps.
 
 * By using a Git dependency instead of specifying a semver range, they are
-  explicitly opting out of the normal semver guarentee, and breakages are to be
+  explicitly opting out of the normal semver guarantee, and breakages are to be
   expected. No one could reasonably expect that pointing a dependency to the
   active development branch without using a lockfile will result in a stable
   system.
@@ -599,7 +599,7 @@ completion plan:
    // ...rest of index.js
    ```
 
-3. When releasing the next major verions of the package, push another commit to
+3. When releasing the next major version of the package, push another commit to
    the "master" branch, remove all files from the branch, leaving behind only a
    minimal README file, package.json and index.js:
 
@@ -639,7 +639,7 @@ completion plan:
    function as of the previous commit. It was just a courteous message to ease
    confusion and provide actionable instructions for fixing the issue.
 
-For most projects and orgnizations, this amount of notice is probably not
+For most projects and organizations, this amount of notice is probably not
 necessary or warranted, but it showcases the available tools and techniques,
 and demonstrates that there can be a good migration path even under very strict
 compatibility requirements. As always, use these steps as a template and tailor
@@ -647,7 +647,7 @@ them to your own needs.
 
 ## Local Migration
 
-Finally, if you are working on a respository you don't control, and you would
+Finally, if you are working on a repository you don't control, and you would
 like to refer to your local branch with a different name without making any
 changes to the upstream project, you can rename your local "master" branch to
 "main" with these steps:
