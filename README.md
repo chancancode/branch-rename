@@ -181,6 +181,8 @@ setup.
        steps:
          - name: Checkout
            uses: actions/checkout@v2
+           with:
+             fetch-depth: 0
          - name: Push
            run: git push origin HEAD:master HEAD:main
    ```
