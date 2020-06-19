@@ -230,7 +230,7 @@ the steps with this:
       - name: Partial clone
         env:
           ref: ${{ github.event.ref }}
-        run: git clone --bare --depth=100 --single-branch --branch "${ref#refs/heads/}" --filter=blob:none '${{ github.event.repository.clone_url }}' .
+        run: git clone --bare --depth=1 --single-branch --branch "${ref#refs/heads/}" --filter=blob:none '${{ github.event.repository.clone_url }}' .
       - name: Push
         run: git push origin HEAD:master HEAD:main
 ```
