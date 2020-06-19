@@ -225,8 +225,7 @@ the steps with this:
 
 ```yaml
       - name: Configure Git
-        run: |
-          git config --global http.https://github.com/.extraheader "Authorization: Basic $(echo -n 'x-access-token:${{ github.token }}' | base64 --wrap=0)"
+        run: git config --global http.https://github.com/.extraheader "Authorization: Basic $(echo -n 'x-access-token:${{ github.token }}' | base64 --wrap=0)"
       - name: Partial clone
         env:
           ref: ${{ github.event.ref }}
