@@ -315,6 +315,13 @@ key instead of the default token when pushing commits, triggering any workflows
 as if a regular user had pushed those commits. This does not change the author
 or committer on the commits.
 
+#### Real World Example
+
+See [this commit][p1-rwe-commit] and [the reuslting workflow run][p1-rwe-run]
+for an example of this working in action. Note that the code in the commit may
+be outdated by the time you read this – refer to the above for the latest
+instructions.
+
 #### Next Steps
 
 After verifying that everything is working as intended, you can start inviting
@@ -439,6 +446,13 @@ Unfortunately, due to limitations of GitHub Actions, it is not possible to add
 a pull request comment from the workflow when the pull request originated from
 a fork, which is very common in open-source repositories. As a workaround, the
 workflow prints the deprecation message to the logs and fails the build.
+
+#### Real World Example
+
+See [this commit][p2-rwe-commit] and [this pull request][p2-rwe-pr] for an
+example of this working in action. Note that the code in the commit may be
+outdated by the time you read this – refer to the above for the latest
+instructions.
 
 #### Next Steps
 
@@ -689,6 +703,14 @@ a reference to this repository may be helpful.
 [checkout-action]: https://github.com/actions/checkout
 
 [generate-ssh-key]: https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+[p1-rwe-commit]: https://github.com/chancancode/ember-concurrency-async/commit/afbacf7088e473dd056138109e00d8749b95b2d0
+
+[p1-rwe-run]: https://github.com/chancancode/ember-concurrency-async/runs/788797792?check_suite_focus=true
+
+[p2-rwe-commit]: https://github.com/chancancode/ember-concurrency-async/commit/7f3509b4363f3fcdb3275ec136c4b5766f39c192
+
+[p2-rwe-pr]: https://github.com/chancancode/ember-concurrency-async/pull/5
 
 [permanent-links]: https://help.github.com/en/github/managing-files-in-a-repository/getting-permanent-links-to-files
 
