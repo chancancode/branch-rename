@@ -317,7 +317,7 @@ or committer on the commits.
 
 #### Real World Example
 
-See [this commit][p1-rwe-commit] and [the reuslting workflow run][p1-rwe-run]
+See [this commit][p1-rwe-commit] and [the resulting workflow run][p1-rwe-run]
 for an example of this working in action. Note that the code in the commit may
 be outdated by the time you read this – refer to the above for the latest
 instructions.
