@@ -9,11 +9,13 @@ jobs:
   mirror:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Mirror to "master"
+        uses: zofrex/mirror-branch@v1
         with:
-          fetch-depth: 0
-      - name: Push
-        run: |
-          git push origin HEAD:master
-          git push origin HEAD:main
+          target-branch: master
+          force: false
+      - name: Mirror to "main"
+        uses: zofrex/mirror-branch@v1
+        with:
+          target-branch: main
+          force: false

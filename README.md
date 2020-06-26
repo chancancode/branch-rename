@@ -179,12 +179,16 @@ setup.
      mirror:
        runs-on: ubuntu-latest
        steps:
-         - name: Checkout
-           uses: actions/checkout@v2
+         - name: Mirror to "master"
+           uses: zofrex/mirror-branch@v1
            with:
-             fetch-depth: 0
-         - name: Push
-           run: git push origin HEAD:master HEAD:main
+             target-branch: master
+             force: false
+         - name: Mirror to "main"
+           uses: zofrex/mirror-branch@v1
+           with:
+             target-branch: main
+             force: false
    ```
 
 4. Commit and your changes to the local "main" branch.
@@ -213,28 +217,8 @@ the impact is very minimal. For reference, GitHub Actions are billed at $0.008
 USD per minute for private repositories, after the free quota is exhausted.
 
 This workflow will be triggered when commits are pushed to either the "master"
-or "main" branch. By default, the [checkout action][checkout-action] fetches
-only the latest commit, which is more than sufficient for our purpose because
-all of the Git objects needed for the ref update are already in the remote
-repository. It then pushes the latest commit to both the "master" and "main"
-branches.
-
-#### Avoiding long checkout times
-
-For large repositories, the checkout can take a long time, and waste a lot of
-bandwidth. To avoid this, you can use the "partial clone" feature by replacing
-the steps with this:
-
-```yaml
-- name: Configure Git
-  run: git config --global http.https://github.com/.extraheader "Authorization: Basic $(echo -n 'x-access-token:${{ github.token }}' | base64 --wrap=0)"
-- name: Partial clone
-  env:
-    ref: ${{ github.event.ref }}
-  run: git clone --bare --depth=1 --single-branch --branch "${ref#refs/heads/}" --filter=blob:none '${{ github.event.repository.clone_url }}' .
-- name: Push
-  run: git push origin HEAD:master HEAD:main
-```
+or "main" branch. It uses the [Mirror Branch action][mirror-branch-action] to
+update the branches using GitHub's API.
 
 #### Interaction with Branch Protection
 
@@ -703,6 +687,8 @@ a reference to this repository may be helpful.
 [checkout-action]: https://github.com/actions/checkout
 
 [generate-ssh-key]: https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+[mirror-branch-action]: https://github.com/marketplace/actions/mirror-branch
 
 [p1-rwe-commit]: https://github.com/chancancode/ember-concurrency-async/commit/afbacf7088e473dd056138109e00d8749b95b2d0
 
