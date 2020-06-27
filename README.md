@@ -240,20 +240,24 @@ to push the commits as an administrator:
 
 3. [Add it as a secret][add-secret] to the repository.
 
-4. Change the "Checkout" step in the mirror workflow to use the new deploy key:
+4. Pass the token to the [Mirror Branch action][mirror-branch-action]:
 
    ```yaml
-   - name: Checkout
-     uses: actions/checkout@v2
+   - name: Mirror to "master"
+     uses: zofrex/mirror-branch@v1
      with:
        token: ${{ secrets.DEPLOY_TOKEN }}
+       target-branch: master
+       force: false
+   - name: Mirror to "main"
+     uses: zofrex/mirror-branch@v1
+     with:
+       token: ${{ secrets.DEPLOY_TOKEN }}
+       target-branch: main
+       force: false
    ```
 
    Here, `DEPLOY_TOKEN` is the name you picked from step 3.
-
-Alternatively, an SSH key for the administrator can be used instead of a
-personal access token, via the `ssh-key` argument. See the documentation for
-the [checkout action][checkout-action] for more details.
 
 #### Interaction with Other GitHub Action Workflows
 
@@ -271,33 +275,14 @@ workflow file (the `on.push.branches` config key). This is the recommended
 approach as it ensures only a single build per push.
 
 Alternatively, if it is important to you that workflows are triggered by pushes
-from the mirror workflow, you can accomplish this by supplying an alternative
-SSH key to the [checkout action][checkout-action]:
+from the mirror workflow, you can accomplish this by supplying a personal
+access token to the [Mirror Branch action][mirror-branch-action] by following
+the steps in the [previous section](#interaction-with-branch-protection).
 
-1. [Generate a new SSH key][generate-ssh-key] locally. Don't worry about adding
-   it to the ssh-agent.
-
-2. Find the generated *public key* and [add it as a deploy key][add-deploy-key]
-   to the repository. Be sure to select "Allow write access".
-
-3. Find the generated *private key* and [add it as a secret][add-secret] to the
-   repository.
-
-4. Change the "Checkout" step in the mirror workflow to use the new deploy key:
-
-   ```yaml
-   - name: Checkout
-     uses: actions/checkout@v2
-     with:
-       ssh-key: ${{ secrets.DEPLOY_KEY }}
-   ```
-
-   Here, `DEPLOY_KEY` is the name you picked from step 3.
-
-With this, the mirror workflow will authenticate with GitHub using the deploy
-key instead of the default token when pushing commits, triggering any workflows
-as if a regular user had pushed those commits. This does not change the author
-or committer on the commits.
+With this, the mirror workflow will authenticate with GitHub using the personal
+access token when updating commits, triggering any workflows as if a regular
+user had pushed those commits. This does not change the author or committer on
+the commits.
 
 #### Real World Example
 
