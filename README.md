@@ -104,8 +104,8 @@ section partially to get your project ready.
 
 5. If there are existing pull requests open against the "master" branch that
    you would like to keep, [update their base branch][change-pr-base-branch] to
-   the "main" branch. Otherwise, they will be closed automatically when we
-   delete the remote "master" branch on GitHub.
+   the "main" branch. Any unchanged pull requests will be closed automatically when we
+   delete the remote "master" branch on GitHub. If you have multiple pull requests that require a base branch update, consider using the [retarget_prs](https://github.com/ethomson/retarget_prs) utility to automate this change.
 
 6. Delete your local "master" branch:
 
