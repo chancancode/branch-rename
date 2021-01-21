@@ -1,3 +1,11 @@
+> :warning: **These instructions are obselete!** :warning:
+>
+> Since these instructions were written, GitHub has released [first-class support
+> for renaming repositories](https://github.com/github/renaming), addressing most
+> of the issues raised here (e.g. redirects). Some of these considerations may
+> still apply (e.g. accessing the impact on package managers), but for the most
+> part, you should now refer to the GitHub documentation on this topic.
+
 # Git Branch Rename
 
 So, you want to rename a branch on Git/GitHub. The most common case of this is
